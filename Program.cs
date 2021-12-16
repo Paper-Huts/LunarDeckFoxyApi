@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace lunar_deck_api
+namespace LunarDeckFoxyApi
 {
     public class Program
     {

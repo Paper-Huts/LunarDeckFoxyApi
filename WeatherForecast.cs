@@ -1,6 +1,6 @@
 using System;
 
-namespace lunar_deck_api
+namespace LunarDeckFoxyApi
 {
     public class WeatherForecast
     {

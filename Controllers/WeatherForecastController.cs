@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace lunar_deck_api.Controllers
+namespace LunarDeckFoxyApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
