@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>lunar_deck_api</RootNamespace>
+    <RootNamespace>LunarDeckFoxyApi</RootNamespace>
     <UserSecretsId>f1f13983-d3c4-45b5-a53c-708842e58166</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
