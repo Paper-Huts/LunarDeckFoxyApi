@@ -27,5 +27,10 @@ namespace LunarDeckFoxyApi.Models
 
         [BsonRepresentation(BsonType.Timestamp)]
         public DateTime CreatedAt { get; set; }
+
+        [BsonRepresentation(BsonType.Timestamp)]
+        public DateTime LastUpdatedAt { get; set; } = DateTime.MinValue;
+
+        public string JwtToken { get; set; }
     }
 }
