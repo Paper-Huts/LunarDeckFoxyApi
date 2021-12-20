@@ -1,3 +1,4 @@
+using LunarDeckFoxyApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,6 +29,11 @@ namespace LunarDeckFoxyApi
         {
 
             services.AddControllers();
+
+            // database settings mapping
+            services.Configure<LunarDeckDatabaseSettings>(Configuration.GetSection("LunarDeckDB"));
+
+            // swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "lunar_deck_api", Version = "v1" });
