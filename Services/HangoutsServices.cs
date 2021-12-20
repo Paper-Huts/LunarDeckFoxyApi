@@ -10,13 +10,13 @@ namespace LunarDeckFoxyApi.Services
     {
         private readonly IMongoCollection<Hangout> _hangoutsCollection;
 
-        public HangoutsServices(IOptions<LunarDeckDatabaseSettings> lunarDeckDatabaseSettings)
+        public HangoutsServices(IOptions<LunarDeckDatabaseSettings> dbSettings)
         {
-            var mongoClient = new MongoClient(lunarDeckDatabaseSettings.Value.ConnectionString);
+            var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
 
-            var mongoDatabase = mongoClient.GetDatabase(lunarDeckDatabaseSettings.Value.DatabaseName);
+            var mongoDatabase = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
 
-            _hangoutsCollection = mongoDatabase.GetCollection<Hangout>(lunarDeckDatabaseSettings.Value.HangoutsCollectionName);
+            _hangoutsCollection = mongoDatabase.GetCollection<Hangout>(dbSettings.Value.HangoutsCollectionName);
         }
 
         public async Task<List<Hangout>> GetAsync() => await _hangoutsCollection.Find(_ => true).ToListAsync();

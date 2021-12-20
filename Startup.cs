@@ -34,6 +34,7 @@ namespace LunarDeckFoxyApi
             // database settings mapping
             services.Configure<LunarDeckDatabaseSettings>(Configuration.GetSection("LunarDeckDB"));
             services.AddScoped<HangoutsServices>();
+            services.AddScoped<AuthenticationServices>();
 
             // swagger
             services.AddSwaggerGen(c =>
