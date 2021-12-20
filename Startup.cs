@@ -1,4 +1,5 @@
 using LunarDeckFoxyApi.Models;
+using LunarDeckFoxyApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +33,7 @@ namespace LunarDeckFoxyApi
 
             // database settings mapping
             services.Configure<LunarDeckDatabaseSettings>(Configuration.GetSection("LunarDeckDB"));
+            services.AddScoped<HangoutsServices>();
 
             // swagger
             services.AddSwaggerGen(c =>
