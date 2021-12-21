@@ -10,7 +10,7 @@ namespace LunarDeckFoxyApi.Models
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public int Id { get; set; } 
+        public string Id { get; set; } 
 
         public string LunarId { get; set; }
 
@@ -22,14 +22,16 @@ namespace LunarDeckFoxyApi.Models
 
         public string Password { get; set; }
 
+        public string ConfirmPassword { get; set; }
+
         [Phone]
         public string PhoneNumber { get; set; }
 
-        [BsonRepresentation(BsonType.Timestamp)]
-        public DateTime CreatedAt { get; set; }
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [BsonRepresentation(BsonType.Timestamp)]
-        public DateTime LastUpdatedAt { get; set; } = DateTime.MinValue;
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime LastUpdatedAt { get; set; };
 
         public string JwtToken { get; set; }
     }
