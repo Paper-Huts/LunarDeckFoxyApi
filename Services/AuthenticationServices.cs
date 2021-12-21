@@ -27,26 +27,17 @@ namespace LunarDeckFoxyApi.Services
 
         // TODO: get user by email / phone number and password to log in user
 
-        public async Task<User> GetUserByEmailLogInCredentialsAsync(User user) {
+        public async Task<User> GetUserByEmailCredentialsAsync(User user) => await _usersCollection.Find(x =>
+                x.Email == user.Email).FirstOrDefaultAsync();
 
-            var foundUser = await _usersCollection.FindAsync(x =>
-                x.Email == user.Email &&
-                x.Password == user.Password);
-
-            return (User)foundUser;
-        }
-
-        //public async Task GetUserByPhoneLogInCredentialsAsync(User user) =>
-        //    await _usersCollection.FindAsync(x =>
-        //    x.Email == user.PhoneNumber &&
-        //    x.Password == user.Password);
+        public async Task<User> GetUserByPhoneNumberCredentialsAsync(User user) =>
+            await _usersCollection.Find(x =>
+            x.PhoneNumber == user.PhoneNumber).FirstOrDefaultAsync();
 
         // TODO: update user data
 
         // TODO: delete user information
 
         // TODO: get all users from database
-
-        public async Task
     }
 }
