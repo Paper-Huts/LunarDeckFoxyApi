@@ -31,7 +31,7 @@ namespace LunarDeckFoxyApi.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [BsonRepresentation(BsonType.DateTime)]
-        public DateTime LastUpdatedAt { get; set; };
+        public DateTime LastUpdatedAt { get; set; }
 
         public string JwtToken { get; set; }
     }

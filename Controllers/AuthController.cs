@@ -1,8 +1,11 @@
-﻿using LunarDeckFoxyApi.Models;
+﻿using LunarDeckFoxyApi.Authentication;
+using LunarDeckFoxyApi.Models;
 using LunarDeckFoxyApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
 
@@ -14,11 +17,13 @@ namespace LunarDeckFoxyApi.Controllers
     {
         private readonly AuthenticationServices _authServices;
         private readonly LinkGenerator _linkGenerator;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(AuthenticationServices service, LinkGenerator linkGenerator)
+        public AuthController(AuthenticationServices service, LinkGenerator linkGenerator, IConfiguration configuration)
         {
             _authServices = service;
             _linkGenerator = linkGenerator;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -27,6 +32,7 @@ namespace LunarDeckFoxyApi.Controllers
         /// </summary>
         /// <param name="signUpUser"></param>
         /// <returns>An authenticated user with JWT session token</returns>
+        [AllowAnonymous]
         [HttpPost("sign-up")]
         public async Task<ActionResult<User>> CreateNewUser([FromBody] User signUpUser)
         {
@@ -34,20 +40,34 @@ namespace LunarDeckFoxyApi.Controllers
             if (signUpUser.Name == null) return BadRequest("User must have a name");
 
             // check if user exists
+            var user = new User();
 
-            var user = await _authServices.GetUserByEmailCredentialsAsync(signUpUser);
+            if (signUpUser.Email != null)
+            {
+                user = await _authServices.GetUserByEmailCredentialsAsync(signUpUser);
+            }
+
+            if (signUpUser.PhoneNumber != null)
+            {
+                user = await _authServices.GetUserByEmailCredentialsAsync(signUpUser);
+            }
 
             if (user != null) return BadRequest("User already exists");
 
-            //
+            // if user does not exist, create new user
             
             try
             {
                 await _authServices.CreateAsync(signUpUser);
 
-                var location = _linkGenerator.GetPathByAction("LogInUser", "Auth", signUpUser);
+                var newUser = await _authServices.GetUserByEmailCredentialsAsync(signUpUser);
 
-                return Created(location,await _authServices.GetUserByEmailCredentialsAsync(signUpUser));
+                newUser.JwtToken = new JwtTokenBuilder(_configuration).Build(newUser);
+
+                // only use location for non-auth requests
+                //var location = _linkGenerator.GetPathByAction("LogInUser", "Auth", newUser);
+
+                return Ok(newUser);
             }
             catch (Exception)
             {
@@ -55,11 +75,15 @@ namespace LunarDeckFoxyApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Checks if user exists using provided email or password in <c>loginUser</c> object
+        /// </summary>
+        /// <param name="loginUser"></param>
+        /// <returns>A user object with JWT token or bad request if unsuccessful</returns>
+        [AllowAnonymous]
         [HttpPost("log-in")]
         public async Task<ActionResult<User>> LogInUser([FromBody] User loginUser)
         {
-            if (loginUser.Email == null && loginUser.PhoneNumber == null) 
-                return BadRequest("Email or phone number is required to log in");
 
             try
             {
@@ -69,6 +93,7 @@ namespace LunarDeckFoxyApi.Controllers
                     var authenticatedUser = await _authServices.GetUserByEmailCredentialsAsync(loginUser);
 
                     // TODO: create and add JWT token to authenticated user
+                    var token = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
 
                     if (authenticatedUser != null) return Ok(authenticatedUser);
                 }
@@ -79,11 +104,12 @@ namespace LunarDeckFoxyApi.Controllers
                     var authenticatedUser = await _authServices.GetUserByPhoneNumberCredentialsAsync(loginUser);
 
                     // TODO: create and add JWT token to authenticated user
+                    var token = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
 
                     if (authenticatedUser != null) return Ok(authenticatedUser);
                 }
 
-                return BadRequest("Unsuccessful log in with email or phone number. Try again");
+                return BadRequest("Email or phone number is required to log in. Try again");
 
             }
             catch (Exception)

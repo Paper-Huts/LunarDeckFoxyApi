@@ -1,3 +1,4 @@
+using LunarDeckFoxyApi.Authentication;
 using LunarDeckFoxyApi.Models;
 using LunarDeckFoxyApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,9 +42,9 @@ namespace LunarDeckFoxyApi
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = "LunarDeck.Auth.Foxy",
-                        ValidAudience = "LunarDeck.Auth.Foxy",
-                        //IssuerSigningKey = new JwtSecurityKey(Configuration).Create()
+                        ValidIssuer = Configuration.GetSection("Auth:JwtIssuer").Value,
+                        ValidAudience = Configuration.GetSection("Auth:JwtIssuer").Value,
+                        IssuerSigningKey = new JwtSecurityKey(Configuration).Create()
                     };
                 });
 
