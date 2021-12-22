@@ -36,8 +36,14 @@ namespace LunarDeckFoxyApi.Controllers
         [HttpPost("sign-up")]
         public async Task<ActionResult<User>> CreateNewUser([FromBody] User signUpUser)
         {
-
+            // if user does not have a name, retuen bad request
             if (signUpUser.Name == null) return BadRequest("User must have a name");
+
+            // if user does not provide passwords or provides a short password
+            //if (signUpUser.Password.Length < 8 || signUpUser.Password == null) return BadRequest("User must provide a password");
+
+            // if user passwords do not match, return bad request
+            //if (signUpUser.Password != signUpUser.ConfirmPassword) return BadRequest("Passwords must match");
 
             // check if user exists
             var user = new User();
@@ -92,8 +98,8 @@ namespace LunarDeckFoxyApi.Controllers
                 {
                     var authenticatedUser = await _authServices.GetUserByEmailCredentialsAsync(loginUser);
 
-                    // TODO: create and add JWT token to authenticated user
-                    var token = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
+                    // get user from DB and add JWT token to authenticated user
+                    authenticatedUser.JwtToken = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
 
                     if (authenticatedUser != null) return Ok(authenticatedUser);
                 }
@@ -103,8 +109,8 @@ namespace LunarDeckFoxyApi.Controllers
                 {
                     var authenticatedUser = await _authServices.GetUserByPhoneNumberCredentialsAsync(loginUser);
 
-                    // TODO: create and add JWT token to authenticated user
-                    var token = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
+                    // get user from DB and add JWT token to authenticated user
+                    authenticatedUser.JwtToken = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
 
                     if (authenticatedUser != null) return Ok(authenticatedUser);
                 }

@@ -24,6 +24,8 @@ namespace LunarDeckFoxyApi.Models
 
         public string ConfirmPassword { get; set; }
 
+        public string PasswordHash { get; set; }
+
         [Phone]
         public string PhoneNumber { get; set; }
 
