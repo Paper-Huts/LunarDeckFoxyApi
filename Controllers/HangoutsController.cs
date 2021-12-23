@@ -16,8 +16,8 @@ namespace LunarDeckFoxyApi.Controllers
             _hangoutServices = services;
         }
 
-        [HttpGet("all")]
-        public async Task<ActionResult<List<Hangout>>> Get()
+        [HttpGet]
+        public async Task<ActionResult<List<HangoutModel>>> Get()
         {
 
             try
