@@ -17,7 +17,13 @@ namespace LunarDeckFoxyApi.Authentication
             _configuration = configuration;
         }
 
-        public string Build(User user)
+        /// <summary>
+        /// Builds a JWT token using claims (email, phone number) from properties of the user obejct
+        /// TODO: add <c>lunarId</c> as a claimtype
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>JWT token as string</returns>
+        public string Build(UserModel user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
