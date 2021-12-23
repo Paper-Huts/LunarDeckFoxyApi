@@ -1,6 +1,6 @@
 ﻿namespace LunarDeckFoxyApi.Models
 {
-    public class Rsvp
+    public class RsvpModel
     {
     }
 }

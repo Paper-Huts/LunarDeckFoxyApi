@@ -1,6 +1,6 @@
 ﻿namespace LunarDeckFoxyApi.Models
 {
-    public class LunarDeckDatabaseSettings
+    public class LunarDeckDatabaseSettingsModel
     {
         public string ConnectionString { get; set; } = null!;
 

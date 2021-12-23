@@ -5,7 +5,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LunarDeckFoxyApi.Models
 {
-    public class User
+
+    public class UserModel
     {
 
         [BsonId]
@@ -20,8 +21,10 @@ namespace LunarDeckFoxyApi.Models
         [EmailAddress]
         public string Email { get; set; }
 
+        [BsonIgnore]
         public string Password { get; set; }
 
+        [BsonIgnore]
         public string ConfirmPassword { get; set; }
 
         public string PasswordHash { get; set; }
@@ -34,7 +37,8 @@ namespace LunarDeckFoxyApi.Models
 
         [BsonRepresentation(BsonType.DateTime)]
         public DateTime LastUpdatedAt { get; set; }
-
+        
+        [BsonIgnore]
         public string JwtToken { get; set; }
     }
 }

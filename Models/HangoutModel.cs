@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace LunarDeckFoxyApi.Models
 {
-    public class Hangout
+    public class HangoutModel
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
