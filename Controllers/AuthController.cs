@@ -34,46 +34,75 @@ namespace LunarDeckFoxyApi.Controllers
         /// <returns>An authenticated user with JWT session token</returns>
         [AllowAnonymous]
         [HttpPost("sign-up")]
-        public async Task<ActionResult<User>> CreateNewUser([FromBody] User signUpUser)
+        public async Task<ActionResult<UserModel>> CreateNewUser([FromBody] AuthModel signUpUser)
         {
             // if user does not have a name, retuen bad request
-            if (signUpUser.Name == null) return BadRequest("User must have a name");
+            if (signUpUser.Name == "") return BadRequest("User must have a name");
 
             // if user does not provide passwords or provides a short password
-            //if (signUpUser.Password.Length < 8 || signUpUser.Password == null) return BadRequest("User must provide a password");
+            if (signUpUser.Password.Length < 8 || signUpUser.Password == "") return BadRequest("User must provide a valid password");
 
             // if user passwords do not match, return bad request
-            //if (signUpUser.Password != signUpUser.ConfirmPassword) return BadRequest("Passwords must match");
-
-            // check if user exists
-            var user = new User();
-
-            if (signUpUser.Email != null)
-            {
-                user = await _authServices.GetUserByEmailCredentialsAsync(signUpUser);
-            }
-
-            if (signUpUser.PhoneNumber != null)
-            {
-                user = await _authServices.GetUserByEmailCredentialsAsync(signUpUser);
-            }
-
-            if (user != null) return BadRequest("User already exists");
+            if (signUpUser.Password != signUpUser.ConfirmPassword) return BadRequest("Passwords must match");
 
             // if user does not exist, create new user
-            
+            var newUser = new UserModel()
+            {
+                Name = signUpUser.Name,
+                Email = signUpUser.Email ?? "",
+                PhoneNumber = signUpUser.PhoneNumber ?? "",
+                PasswordHash = Encryptor.MD5Hash(signUpUser.Password)
+            }; 
+
+            // check if user exists
+            var userCheck = new UserModel();
+
+            if (newUser.Email != "")
+            {
+                userCheck = await _authServices.GetUserByEmailCredentialsAsync(newUser);
+            }
+
+            if (newUser.PhoneNumber != "")
+            {
+                userCheck = await _authServices.GetUserByPhoneNumberCredentialsAsync(newUser);
+            }
+
+            if (userCheck != null) return BadRequest("User already exists");
+
             try
             {
-                await _authServices.CreateAsync(signUpUser);
+                UserModel newAuthenticatedUser = null;
 
-                var newUser = await _authServices.GetUserByEmailCredentialsAsync(signUpUser);
+                await _authServices.CreateAsync(newUser);
 
-                newUser.JwtToken = new JwtTokenBuilder(_configuration).Build(newUser);
+                // if user signed up with email
+                if (newUser.Email != "")
+                {
+                    newAuthenticatedUser = await _authServices.GetUserByEmailCredentialsAsync(newUser);
+                }
 
-                // only use location for non-auth requests
-                //var location = _linkGenerator.GetPathByAction("LogInUser", "Auth", newUser);
+                // if user signed up with phone number
+                if (newUser.PhoneNumber != "")
+                {
+                    newAuthenticatedUser = await _authServices.GetUserByPhoneNumberCredentialsAsync(newUser);
+                }
 
-                return Ok(newUser);
+                if (newAuthenticatedUser != null)
+                {
+                    return Ok(new UserModel()
+                    {
+                        Id = newAuthenticatedUser.Id,
+                        Name = newAuthenticatedUser.Name,
+                        Email = newAuthenticatedUser.Email ?? "",
+                        PhoneNumber = newAuthenticatedUser.PhoneNumber ?? "",
+                        JwtToken = new JwtTokenBuilder(_configuration).Build(newAuthenticatedUser),
+                        CreatedAt = newAuthenticatedUser.CreatedAt,
+                        LastUpdatedAt = newAuthenticatedUser.LastUpdatedAt,
+                        LunarId = newAuthenticatedUser.LunarId ?? "",
+                    });
+                }
+
+                return BadRequest("Sign up unsuccessful. Please try again");
             }
             catch (Exception)
             {
@@ -88,31 +117,59 @@ namespace LunarDeckFoxyApi.Controllers
         /// <returns>A user object with JWT token or bad request if unsuccessful</returns>
         [AllowAnonymous]
         [HttpPost("log-in")]
-        public async Task<ActionResult<User>> LogInUser([FromBody] User loginUser)
+        public async Task<ActionResult<UserModel>> LogInUser([FromBody] AuthModel loginUser)
         {
+            // if user does not provide passwords or provides a short password
+            if (loginUser.Password.Length < 8 || loginUser.Password == "") return BadRequest("User must provide an acceptable password");
+
+            // created new user model
+            var userCheck = new UserModel()
+            {
+                Email = loginUser.Email ?? "",
+                PhoneNumber = loginUser.PhoneNumber ?? "",
+                PasswordHash = Encryptor.MD5Hash(loginUser.Password)
+            };
 
             try
             {
-                // if email available, log in with email
-                if (loginUser.Email != null)
+                UserModel authenticatedUser = null;
+
+                // if email available
+                if (loginUser.Email != "")
                 {
-                    var authenticatedUser = await _authServices.GetUserByEmailCredentialsAsync(loginUser);
+                    authenticatedUser = await _authServices.GetUserByEmailCredentialsAsync(userCheck);
 
-                    // get user from DB and add JWT token to authenticated user
-                    authenticatedUser.JwtToken = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
-
-                    if (authenticatedUser != null) return Ok(authenticatedUser);
+                    // check if correct password was entered
+                    //if (authenticatedUser.PasswordHash != loginPWHash)
+                    //    return BadRequest("Incorrect user password");
                 }
 
-                // if phone number available, log in
-                if (loginUser.PhoneNumber != null)
+                // if phone number available
+                if (loginUser.PhoneNumber != "")
                 {
-                    var authenticatedUser = await _authServices.GetUserByPhoneNumberCredentialsAsync(loginUser);
 
-                    // get user from DB and add JWT token to authenticated user
-                    authenticatedUser.JwtToken = new JwtTokenBuilder(_configuration).Build(authenticatedUser);
+                    // get user from DB
+                    authenticatedUser = await _authServices.GetUserByPhoneNumberCredentialsAsync(userCheck);
 
-                    if (authenticatedUser != null) return Ok(authenticatedUser);
+                    // check if correct password was entered
+                    //if (authenticatedUser.PasswordHash != loginPWHash)
+                    //    return BadRequest("Incorrect user password");
+                }
+
+                // add JWT token to authenticated user
+                if (authenticatedUser != null)
+                {
+                    return Ok(new UserModel()
+                    {
+                        Id = authenticatedUser.Id,
+                        Name = authenticatedUser.Name,
+                        Email = authenticatedUser.Email ?? "",
+                        PhoneNumber = authenticatedUser.PhoneNumber ?? "",
+                        JwtToken = new JwtTokenBuilder(_configuration).Build(authenticatedUser),
+                        CreatedAt = authenticatedUser.CreatedAt,
+                        LastUpdatedAt = authenticatedUser.LastUpdatedAt,
+                        LunarId = authenticatedUser.LunarId ?? "",
+                    });
                 }
 
                 return BadRequest("Email or phone number is required to log in. Try again");

@@ -7,15 +7,15 @@ namespace LunarDeckFoxyApi.Services
 {
     public class AuthenticationServices
     {
-        private readonly IMongoCollection<User> _usersCollection;
+        private readonly IMongoCollection<UserModel> _usersCollection;
 
-        public AuthenticationServices(IOptions<LunarDeckDatabaseSettings> dbSettings)
+        public AuthenticationServices(IOptions<LunarDeckDatabaseSettingsModel> dbSettings)
         {
             var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
 
             var mongoDatabase = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
 
-            _usersCollection = mongoDatabase.GetCollection<User>(dbSettings.Value.UsersCollectionName);
+            _usersCollection = mongoDatabase.GetCollection<UserModel>(dbSettings.Value.UsersCollectionName);
         }
 
         /// <summary>
@@ -23,16 +23,19 @@ namespace LunarDeckFoxyApi.Services
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public async Task CreateAsync(User user) => await _usersCollection.InsertOneAsync(user);
+        public async Task CreateAsync(UserModel user) => await _usersCollection.InsertOneAsync(user);
 
         // TODO: get user by email / phone number and password to log in user
 
-        public async Task<User> GetUserByEmailCredentialsAsync(User user) => await _usersCollection.Find(x =>
-                x.Email == user.Email).FirstOrDefaultAsync();
+        public async Task<UserModel> GetUserByEmailCredentialsAsync(UserModel user) => 
+            await _usersCollection.Find(x => 
+            x.Email == user.Email && 
+            x.PasswordHash == user.PasswordHash).FirstOrDefaultAsync();
 
-        public async Task<User> GetUserByPhoneNumberCredentialsAsync(User user) =>
+        public async Task<UserModel> GetUserByPhoneNumberCredentialsAsync(UserModel user) =>
             await _usersCollection.Find(x =>
-            x.PhoneNumber == user.PhoneNumber).FirstOrDefaultAsync();
+            x.PhoneNumber == user.PhoneNumber && 
+            x.PasswordHash == user.PasswordHash).FirstOrDefaultAsync();
 
         // TODO: update user data
 
