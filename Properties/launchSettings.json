@@ -15,7 +15,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://lunardeckfoxyapivault.vault.azure.net/",
+        "FoxyVaultUri": "https://lunardeckfoxyapivault.vault.azure.net/",
         "AZURE_USERNAME": "paperhuts.dev@gmail.com"
       }
     },
@@ -24,9 +24,7 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://lunardeckfoxyapivault.vault.azure.net/",
-        "AZURE_USERNAME": "paperhuts.dev@gmail.com"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
@@ -36,11 +34,7 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "publishAllPorts": true,
-      "useSSL": true,
-      "environmentVariables": {
-        "VaultUri": "https://lunardeckfoxyapivault.vault.azure.net/",
-        "AZURE_USERNAME": "paperhuts.dev@gmail.com"
-      }
+      "useSSL": true
     }
   }
 }
