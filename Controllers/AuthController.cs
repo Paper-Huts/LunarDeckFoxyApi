@@ -16,13 +16,13 @@ namespace LunarDeckFoxyApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthenticationServices _authServices;
-        private readonly LinkGenerator _linkGenerator;
+        //private readonly LinkGenerator _linkGenerator;
         private readonly IConfiguration _configuration;
 
         public AuthController(AuthenticationServices service, LinkGenerator linkGenerator, IConfiguration configuration)
         {
             _authServices = service;
-            _linkGenerator = linkGenerator;
+            //_linkGenerator = linkGenerator;
             _configuration = configuration;
         }
 

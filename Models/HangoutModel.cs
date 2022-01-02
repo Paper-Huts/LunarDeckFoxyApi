@@ -2,6 +2,7 @@
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace LunarDeckFoxyApi.Models
 {
@@ -13,6 +14,7 @@ namespace LunarDeckFoxyApi.Models
 
         public string LunarId { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
         public string Description { get; set; }
@@ -28,7 +30,7 @@ namespace LunarDeckFoxyApi.Models
         public string CreatedBy { get; set; }
 
         [BsonRepresentation(BsonType.DateTime)]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         //public List<Rsvp> RsvpList { get; set; }
 
