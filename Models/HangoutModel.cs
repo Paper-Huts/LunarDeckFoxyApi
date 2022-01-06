@@ -32,6 +32,9 @@ namespace LunarDeckFoxyApi.Models
         [BsonRepresentation(BsonType.DateTime)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime LastUpdatedAt { get; set;} = DateTime.UtcNow;
+
         //public List<Rsvp> RsvpList { get; set; }
 
     }

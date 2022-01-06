@@ -16,12 +16,12 @@ namespace LunarDeckFoxyApi.Controllers
     public class HangoutsController : ControllerBase
     {
         private readonly HangoutsServices _hangoutServices;
-        //private readonly LinkGenerator _linkGenerator;
+        private readonly LinkGenerator _linkGenerator;
 
         public HangoutsController(HangoutsServices services, LinkGenerator linkGenerator)
         {
             _hangoutServices = services;
-            //_linkGenerator = linkGenerator;
+            _linkGenerator = linkGenerator;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace LunarDeckFoxyApi.Controllers
             }
             catch (Exception)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError);
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
         }
 
@@ -63,7 +63,7 @@ namespace LunarDeckFoxyApi.Controllers
             }
             catch (Exception)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError);
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
 
         }
@@ -89,7 +89,42 @@ namespace LunarDeckFoxyApi.Controllers
             }
             catch (Exception)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError);
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing hangout
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="model"></param>
+        /// <returns>The updated hangout</returns>
+        [HttpPut("{id}")]
+        public async Task<ActionResult<HangoutModel>> UpdateHangout(string id, [FromBody] HangoutModel model)
+        {
+            if (id != model.Id || id == "" || model.Id == null)
+            {
+                return BadRequest("Invalid hangout id");
+            }
+
+            HangoutModel hangout = await _hangoutServices.GetAsync(model.Id);
+
+            if (hangout == null) return NotFound("Hangout not found.");
+
+            model.LastUpdatedAt = DateTime.Now;
+
+            try
+            {
+
+                await _hangoutServices.UpdateAsync(id, model);
+
+                hangout = await _hangoutServices.GetAsync(model.Id);
+
+                return Ok(hangout);
+            }
+            catch (Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
         }
     }
