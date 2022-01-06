@@ -127,5 +127,39 @@ namespace LunarDeckFoxyApi.Controllers
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
         }
+
+
+        [HttpDelete("{id}")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteHangout(string id)
+        {
+            if (id == "" || id == null)
+            {
+                return BadRequest("Invalid hangout id");
+            }
+
+            try
+            {
+
+                HangoutModel hangout = await _hangoutServices.GetAsync(id);
+
+                if (hangout == null) return NotFound("Hangout not found.");
+
+                await _hangoutServices.RemoveAsync(id);
+
+                hangout = await _hangoutServices.GetAsync(id);
+
+                if (hangout != null)
+                {
+                    return BadRequest("Failed to delete hangout.");
+                }
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+        }
     }
 }
